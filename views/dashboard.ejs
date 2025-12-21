@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/admin/dashboard.css"/>
+</head>
+<body>
+    <nav class="nav">
+        <ul>
+            <li><a href="/admin/users">Dashboard</a></li>
+            <li><a href="/admin/user">User</a></li>
+            <li><a href="/admin/logs">User Logs</a></li>
+            <li><a href="/admin/userupdate">User Update</a></li>
+            <li><a href="/admin/product">Products</a></li>
+            <li><a href="/admin/statistics">Statistics</a></li>
+            <li><a href="/admin/update">Settings</a></li>
+            <li><a href="/admin/sendmessage">Send Message</a></li>
+	    
+            <li><a href="/admin/logout">Logout</a></li>
+        </ul>
+    </nav>
+    <div class="dasboard-container">
+        <h2>Welcome,Admin</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>Balance</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% users.forEach(user=>{ %>
+                    <tr>
+                        <td><%= user.userId %></td>
+                        <td><%= user.balance %></td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Details</title>
+    <link rel="stylesheet" href="/admin/user.css">
+</head>
+<body>
+       <nav class="nav">
+        <ul>
+            <li><a href="/admin/users">Dashboard</a></li>
+            <li><a href="/admin/user">User</a></li>
+            <li><a href="/admin/logs">User Logs</a></li>
+            <li><a href="/admin/userupdate">User Update</a></li>
+            <li><a href="/admin/product">Products</a></li>
+            <li><a href="/admin/statistics">Statistics</a></li>
+            <li><a href="/admin/update">Settings</a></li>
+            <li><a href="/admin/sendmessage">Send Message</a></li>
+            <li><a href="/admin/logout">Logout</a></li>
+        </ul>
+    </nav>
+    <div class="user-container">
+        <h2>User Info</h2>
+        <form action="/admin/user" method="post">
+            <input type="text" name="userId" placeholder="User ID" required>
+            <button type="submit">Fetch User</button>
+        </form>
+        <%if(user){%>
+            <div class="user-details">
+                <p><strong>User ID:</strong> <%= user.userId %></p>
+                <p><strong>Balance:</strong> <%= user.balance %></p>
+            </div>
+
+
+            <%if(user.orders && user.orders.length){%>
+                 <div class="order-list">
+                    <h3>Orders</h3>
+                    <ul>
+                        <%user.orders.forEach(order=>{%>
+                            <li>
+                                <strong>Order #:</strong> <%= order._id %><br>
+                                <strong>Product:</strong> <%= order.country %><br>
+                                <strong>Amount:</strong> <%= order.isp %><br>
+                                <strong>Price:</strong> <%= order.price %><br>
+                                <strong>Period:</strong> <%= order.period %><br>
+                                <strong>Expire:</strong> <%= order.expireAt %><br>
+                                <strong>Eid:</strong> <%= order.eid %><br>
+                            </li>
+                        <%})%>
+                    </ul>
+                </div>
+            <%}else{%>
+                <p>No orders found for this user.</p>
+            <%}%>
+        <%}%>
+        <%if(error){%>
+            <p class="error"><%= error %></p>
+        <%}%>
+
+        
+    </div>
+</body>
+</html>

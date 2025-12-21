@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Logs</title>
+    <link rel="stylesheet" href="/admin/logs.css">
+</head>
+<body>
+
+<nav class="nav">
+    <ul>
+        <li><a href="/admin/users">Dashboard</a></li>
+        <li><a href="/admin/user">User</a></li>
+        <li><a href="/admin/logs">User Logs</a></li>
+        <li><a href="/admin/userupdate">User Update</a></li>
+        <li><a href="/admin/product">Products</a></li>
+        <li><a href="/admin/statistics">Statistics</a></li>
+        <li><a href="/admin/update">Settings</a></li>
+        <li><a href="/admin/sendmessage">Send Message</a></li>
+        <li><a href="/admin/logout">Logout</a></li>
+    </ul>
+</nav>
+
+<div class="user-container">
+    <h2>User Logs</h2>
+
+    <form action="/admin/logs" method="post">
+        <input type="text" name="userId" placeholder="User ID" required>
+
+        <div class="radio-group">
+            <label>
+                <input
+                    type="radio"
+                    name="historyType"
+                    value="payments"
+                    <% if (historyType === 'payments') { %> checked <% } %>
+                    required
+                >
+                Payment History
+            </label>
+
+            <label>
+                <input
+                    type="radio"
+                    name="historyType"
+                    value="orders"
+                    <% if (historyType === 'orders') { %> checked <% } %>
+                >
+                Order History
+            </label>
+        </div>
+
+        <button type="submit">Fetch User</button>
+    </form>
+
+    <% if (payments && payments.length > 0) { %>
+        <div class="user-details">
+            <h3>Payment History</h3>
+            <% payments.forEach(payment => { %>
+                <p>
+                    <strong>Amount:</strong> <%= payment.amount %><br>
+                    <strong>Date:</strong> <%= payment.createdAt.toISOString() %>
+                </p>
+            <% }) %>
+        </div>
+    <% } %>
+
+    <% if (orders && orders.length > 0) { %>
+        <div class="user-details">
+            <h3>Order History</h3>
+            <% orders.forEach(order => { %>
+                <p>
+                    <strong>Order ID:</strong> <%= order._id %><br>
+                    <strong>Amount:</strong> <%= order.amount %><br>
+                    <strong>Date:</strong> <%= order.createdAt.toISOString() %>
+                </p>
+            <% }) %>
+        </div>
+    <% } %>
+
+    <% if (error) { %>
+        <p class="error"><%= error %></p>
+    <% } %>
+</div>
+
+</body>
+</html>

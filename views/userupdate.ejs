@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update User</title>
+    <link rel="stylesheet" href="/admin/userupdate.css"/>
+</head>
+<body>
+       <nav class="nav">
+        <ul>
+            <li><a href="/admin/users">Dashboard</a></li>
+            <li><a href="/admin/user">User</a></li>
+            <li><a href="/admin/logs">User Logs</a></li>
+            <li><a href="/admin/userupdate">User Update</a></li>
+            <li><a href="/admin/product">Products</a></li>
+            <li><a href="/admin/statistics">Statistics</a></li>
+            <li><a href="/admin/update">Settings</a></li>
+            <li><a href="/admin/sendmessage">Send Message</a></li>
+            <li><a href="/admin/logout">Logout</a></li>
+        </ul>
+    </nav>
+    <div class="update-container">
+        <h2>Update Balance</h2>
+        <form action="/admin/userupdate?_method=PATCH" method="post">
+            <input type="text" name="userId" placeholder="User ID" required>
+            <input type="text" name="balance" placeholder="New Balance" required>
+            <button type="submit">Update</button>
+        </form>
+        <%if(message){%>
+            <p class="message"><%= message %></p>
+        <%}%>
+
+        <%if(error){%>
+            <p class="error"><%=error%></p>
+        <%}%>
+    </div>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Income Statistics</title>
+    <link rel="stylesheet" href="/admin/statistics.css" />
+</head>
+<body>
+       <nav class="nav">
+        <ul>
+            <li><a href="/admin/users">Dashboard</a></li>
+            <li><a href="/admin/user">User</a></li>
+            <li><a href="/admin/logs">User Logs</a></li>
+            <li><a href="/admin/userupdate">User Update</a></li>
+            <li><a href="/admin/product">Products</a></li>
+            <li><a href="/admin/statistics">Statistics</a></li>
+            <li><a href="/admin/update">Settings</a></li>
+            <li><a href="/admin/sendmessage">Send Message</a></li>
+            <li><a href="/admin/logout">Logout</a></li>
+        </ul>
+    </nav>
+    <div class="statistics-container">
+        <h2>Monthly Income Statistics</h2>
+        <%if(error){%>
+             <p class="error"><%= error %></p>
+        <%}else{%>
+            <div class="stat-box"> 
+                <p><strong>Month:</strong><%= Month %></p>
+                <p><strong>Total:</strong><%= Total %></p>
+                <p><strong>Shop:</strong><%= shop %></p>
+            </div>
+        <%}%>
+        
+    </div>
+
+</body>
+</html>
