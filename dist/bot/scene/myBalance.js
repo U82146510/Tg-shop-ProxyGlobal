@@ -1,3 +1,4 @@
+
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -30,7 +31,7 @@ function generateUniqueUsdtAmount(baseAmount) {
 }
 
 
-    
+
 if (envResult.error) {
     throw new Error('missing key encription');
 }
@@ -79,6 +80,9 @@ function registerBalanceMenu(bot) {
             await ctx.reply('⚠️ Error showing balance.');
         }
     });
+
+
+    
     bot.callbackQuery("deposit_crypto", async (ctx) => {
         try {
             await ctx.answerCallbackQuery();
@@ -92,19 +96,39 @@ function registerBalanceMenu(bot) {
             }
         }
         const telegramId = ctx.from?.id;
-        if (!telegramId)
-            return;
+        if (!telegramId) return;
+
         try {
             await (0, cleanup_1.deleteCachedMessages)(ctx, `user_balance${telegramId}`);
+
             const keyboard = new grammy_1.InlineKeyboard().text('🏠 Main Menu', 'back_to_menu').row();
             const redisKey = `input_balance${telegramId}`;
-            const msg = await ctx.reply('💰 *Enter the amount of USDT you want to deposit:*\n\n' +
-                '⚠️ *Important:* Only the *last generated deposit request* will be accepted.\n' +
-                'If you create a new one before paying the previous one, the earlier one will be ignored.\n\n' +
-                '✅ After sending the exact amount, please *wait for confirmation*.\n\n' +
-                '⏳ Deposit window is valid for 15 minutes.', {
-                reply_markup: keyboard, parse_mode: 'Markdown',
+
+            // Language-sensitive menu text
+            const isRussian = ctx.from.language_code === 'ru';
+            const menuText = isRussian
+                ? '💰 Введите сумму USDT для пополнения\n\n' +
+                '⚠️ Важно:\n' +
+                '• Принимается только USDT (сеть TRC20)\n' +
+                '• Будет обработан только последний сгенерированный запрос на пополнение\n' +
+                '• Если вы создадите новый запрос до оплаты предыдущего, предыдущий будет проигнорирован\n\n' +
+                '✅ После отправки точной суммы USDT (TRC20) дождитесь подтверждения.\n\n' +
+                '💬 Хотите оплатить другой криптовалютой?\n' +
+                'Свяжитесь с нашей службой поддержки для организации альтернативного способа оплаты.'
+                : '💰 Enter the amount of USDT you want to deposit\n\n' +
+                '⚠️ Important:\n' +
+                '• Only USDT (TRC20 network) is accepted\n' +
+                '• Only the last generated deposit request will be processed\n' +
+                '• If you create a new request before paying the previous one, the earlier one will be ignored\n\n' +
+                '✅ After sending the exact amount of USDT (TRC20), please wait for confirmation.\n\n' +
+                '💬 Want to pay with another cryptocurrency?\n' +
+                'Contact our support team to arrange an alternative payment method.';
+
+            const msg = await ctx.reply(menuText, {
+                reply_markup: keyboard,
+                parse_mode: 'Markdown',
             });
+
             await redis_1.redis.pushList(redisKey, [String(msg.message_id)]);
             await redis_1.redis.set(`state:${telegramId}`, `awaiting_deposit_amount`);
         }
@@ -112,6 +136,9 @@ function registerBalanceMenu(bot) {
             console.error(error);
         }
     });
+
+
+
     bot.on('message:text', async (ctx2) => {
         const telegramId = ctx2.from?.id;
         if (!telegramId)
@@ -153,10 +180,9 @@ function registerBalanceMenu(bot) {
             user.expectedAmountExpiresAt = undefined;
             await user.save();
         }
-        
+
         const wallet = await UsdtAccount.findOne();
         if (!wallet) {
-            //await UsdtAccount.create({ address:"Tv1uwzCzhLG9MP1SnGdswEGraGnD1xQj2"});
             const keyboard = new grammy_1.InlineKeyboard().text('🏠 Main Menu', 'back_to_menu').row();
             const msg = await ctx2.reply('⚠️ Failed to generate wallet.', {
                 reply_markup: keyboard
@@ -165,7 +191,7 @@ function registerBalanceMenu(bot) {
             return;
         }
 
-         
+
         const uniqueAmountStr = generateUniqueUsdtAmount(amount);
         const expectedAmount = Decimal128.fromString(uniqueAmountStr);
         user.expectedAmount = expectedAmount;
@@ -175,7 +201,12 @@ function registerBalanceMenu(bot) {
 
         const keyboard = new grammy_1.InlineKeyboard().text('🏠 Main Menu', 'back_to_menu').row();
         const redisKey1 = `generating_address${telegramId}`;
-        const msg1 = await ctx2.reply(`✅ Please send *${uniqueAmountStr} USDT* to the following TRC20 address:\n\`\`\`${wallet.address}\`\`\`\n\nOnce received, your balance will be updated automatically.`, { reply_markup: keyboard, parse_mode: 'Markdown' });
+        const msg1 = await ctx2.reply(
+  `✅ Please send the following amount USDT:\n\`\`\`${uniqueAmountStr}\`\`\`\nTRC20 address:\n\`\`\`${wallet.address}\`\`\`\n\nOnce received, your balance will be updated automatically.`,
+  { reply_markup: keyboard, parse_mode: 'Markdown' }
+);
+
+
         await redis_1.redis.pushList(redisKey1, [String(msg1.message_id)]);
         await redis_1.redis.delete(`state:${telegramId}`);
     });
