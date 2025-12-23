@@ -49,6 +49,16 @@
                 >
                 Order History
             </label>
+
+            <label>
+                <input
+                    type="radio"
+                    name="historyType"
+                    value="all"
+                    <% if (historyType === 'all') { %> checked <% } %>
+                >
+                All Orders History
+            </label>
         </div>
 
         <button type="submit">Fetch User</button>
@@ -72,7 +82,27 @@
             <% orders.forEach(order => { %>
                 <p>
                     <strong>Order ID:</strong> <%= order._id %><br>
-                    <strong>Amount:</strong> <%= order.amount %><br>
+                    <strong>Amount:</strong> <%= order.price %><br>
+                    <strong>Country:</strong> <%= order.country %><br>
+                    <strong>ISP:</strong> <%= order.isp %><br>
+                    <strong>Period:</strong> <%= order.period %><br>
+                    <strong>Date:</strong> <%= order.createdAt.toISOString() %>
+                </p>
+            <% }) %>
+        </div>
+    <% } %>
+
+
+    <% if (allOrders && allOrders.length > 0) { %>
+        <div class="user-details">
+            <h3>All orders History</h3>
+            <% allOrders.forEach(order => { %>
+                <p>
+                    <strong>Order ID:</strong> <%= order._id %><br>
+                    <strong>Amount:</strong> <%= order.price %><br>
+                    <strong>Country:</strong> <%= order.country %><br>
+                    <strong>ISP:</strong> <%= order.isp %><br>
+                    <strong>Period:</strong> <%= order.period %><br>
                     <strong>Date:</strong> <%= order.createdAt.toISOString() %>
                 </p>
             <% }) %>
