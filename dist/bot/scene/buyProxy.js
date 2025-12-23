@@ -92,7 +92,8 @@ function registerBuyProxyHandler(bot) {
 
             if (!isps.length) return;
 
-            await redis.set("availableProxy", JSON.stringify(isps));
+            const redisKey = `availableProxy:${telegramId}`;
+            await redis.set(redisKey, JSON.stringify(isps));
 
             const ispCount = new Map();
             for (const isp of isps) {
@@ -128,7 +129,7 @@ function registerBuyProxyHandler(bot) {
         await deleteCachedMessages(ctx, `isp_${telegramId}`);
         await deleteCachedMessages(ctx, `period_${telegramId}`);
 
-        const isps = JSON.parse(await redis.get("availableProxy") || "[]");
+        const isps = JSON.parse(await redis.get(`availableProxy:${telegramId}`) || "[]");
         const selected = isps.find(i => i.operator.toLowerCase() === ispName.toLowerCase());
         if (!selected) return;
 
@@ -186,18 +187,9 @@ function registerBuyProxyHandler(bot) {
         await deleteCachedMessages(ctx, `period_${telegramId}`);
 
         const product = await Product.findOne({ isp: isp.toLowerCase(), period });
-        const user = await User.findOne({ userId: telegramId });
-        if (!product || !user) return;
+        if (!product) return;
 
         const price = new Decimal(product.price);
-        const balance = new Decimal(user.balance.toString());
-
-        if (balance.lessThan(price)) {
-            return ctx.reply("Insufficient balance");
-        }
-
-        const newBalance = balance.minus(price);
-        user.balance = Decimal128.fromString(newBalance.toString());
 
         const expireAt = addDays(new Date(), parseInt(period));
         const proxy = await fetchProxy(
@@ -207,7 +199,26 @@ function registerBuyProxyHandler(bot) {
             product.apikey
         );
 
-        console.log(proxy);
+        if (!proxy || !proxy.proxy_id) {
+            return ctx.reply("Proxy provider error");
+        }
+
+        const updatedUser = await User.findOneAndUpdate(
+            {
+                userId: telegramId,
+                balance: { $gte: Decimal128.fromString(price.toString()) }
+            },
+            {
+                $inc: { balance: Decimal128.fromString(price.neg().toString()) }
+            },
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            return ctx.reply("Insufficient balance");
+        }
+
+        const newBalance = new Decimal(updatedUser.balance.toString());
 
         const order = await Order.create({
             userId: telegramId,
@@ -224,15 +235,15 @@ function registerBuyProxyHandler(bot) {
             proxy_socks5_port: proxy.proxy_socks5_port,
             proxy_hostname: proxy.proxy_hostname,
             proxy_change_ip_url: proxy.proxy_change_ip_url,
-            user: proxy.proxy_login,                 // required
-            pass: proxy.proxy_pass,                 // required
+            user: proxy.proxy_login,
+            pass: proxy.proxy_pass,
             expireAt: new Date(proxy.proxy_exp),
             apikey: product.apikey
         });
 
         const orderHistoryEntry = await orderHistory.create({
             userId: telegramId,
-            country: product.country,  
+            country: product.country,
             isp: isp.toLowerCase(),
             price,
             period,
@@ -245,19 +256,57 @@ function registerBuyProxyHandler(bot) {
             proxy_socks5_port: proxy.proxy_socks5_port,
             proxy_hostname: proxy.proxy_hostname,
             proxy_change_ip_url: proxy.proxy_change_ip_url,
-            user: proxy.proxy_login,                 // required
-            pass: proxy.proxy_pass,                 // required
+            user: proxy.proxy_login,
+            pass: proxy.proxy_pass,
             expireAt: new Date(proxy.proxy_exp),
             apikey: product.apikey
         });
 
-        user.orders.push(order._id);
- 
-        await user.save();
+        updatedUser.orders.push(order._id);
+        await updatedUser.save();
         await orderHistoryEntry.save();
 
-        await ctx.reply(`Order placed successfully\nNew balance: ${newBalance.toFixed(2)} USDT`);
+        const keyboard = new InlineKeyboard()
+            .text("🏠 Main Menu", "back_to_menu")
+            .row();
+
+        await redis.delete(`availableProxy:${telegramId}`);
+        const redisKey = `balance_added${telegramId}`;
+
+const orderDetails = `
+📦 Order #${order._id}
+
+🌍 Country: ${product.country}
+📡 ISP: ${product.isp}
+🗓️ Expires on: ${new Date(proxy.proxy_exp).toUTCString()}
+💰 Price: $${product.price}
+🆔 EID: ${proxy.eid}
+
+🔐 Credentials
+👤 User: ${proxy.proxy_login}
+🔑 Pass: ${proxy.proxy_pass}
+
+🌐 Proxy Hostnames
+HTTP: ${proxy.proxy_hostname}
+SOCKS5: ${proxy.proxy_independent_socks5_hostname || proxy.proxy_hostname}
+
+📦 Ports
+HTTP Port: ${proxy.proxy_http_port}
+SOCKS5 Port: ${proxy.proxy_socks5_port}
+
+🔄 Change IP URL: ${proxy.proxy_change_ip_url}
+
+🔗 Direct Connection
+📶 HTTP: ${proxy.proxy_independent_http_hostname || proxy.proxy_hostname}:${proxy.proxy_http_port}
+🧦 SOCKS5: ${proxy.proxy_independent_socks5_hostname || proxy.proxy_hostname}:${proxy.proxy_socks5_port}
+
+💰 New balance: ${newBalance} USDT
+`;
+
+        const msg = await ctx.reply(orderDetails, { reply_markup: keyboard });
+        await redis.pushList(redisKey, [String(msg.message_id)]);
     });
+
 }
 
 module.exports = { registerBuyProxyHandler };
