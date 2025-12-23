@@ -59,6 +59,17 @@
                 >
                 All Orders History
             </label>
+
+            <label>
+                <input
+                    type="radio"
+                    name="historyType"
+                    value="bycountry"
+                    <% if (historyType === 'bycountry') { %> checked <% } %>
+                >
+                All Orders History By Country
+            </label>
+
         </div>
 
         <button type="submit">Fetch User</button>
@@ -116,3 +127,4 @@
 
 </body>
 </html>
+

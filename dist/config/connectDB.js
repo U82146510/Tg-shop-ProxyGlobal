@@ -1,24 +1,20 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.connect_db = void 0;
-const mongoose_1 = __importDefault(require("mongoose"));
-const dotenv_1 = __importDefault(require("dotenv"));
-const path_1 = __importDefault(require("path"));
-const console_1 = require("console");
-const seed_1 = require("../bot/utils/seed");
-dotenv_1.default.config({
-    path: path_1.default.resolve(__dirname, "../../.env")
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import path from 'path';
+import { createAdmin } from '../bot/utils/seed.js';
+
+dotenv.config({
+    path: path.resolve(process.cwd(), '.env')
 });
+
 const connection_string = process.env.atlas;
 if (!connection_string) {
-    throw new Error("missing connection string");
+    throw new Error("Missing connection string");
 }
-const connect_db = async () => {
+
+export const connect_db = async () => {
     try {
-        await mongoose_1.default.connect(connection_string, {
+        await mongoose.connect(connection_string, {
             serverSelectionTimeoutMS: 5000,
             socketTimeoutMS: 30000,
             maxPoolSize: 50,
@@ -32,27 +28,31 @@ const connect_db = async () => {
             bufferCommands: false,
             waitQueueTimeoutMS: 10000,
         });
-    }
-    catch (error) {
+    } catch (error) {
         console.error(error);
         process.exit(1);
     }
 };
-exports.connect_db = connect_db;
-const db = mongoose_1.default.connection;
-db.on('error', () => {
-    console.error(console_1.error);
-})
-    .on('connected', async () => {
-    console.info('db connected');
-    await (0, seed_1.creteAdmin)();
-})
-    .on('disconnected', () => {
-    console.info('db disconnected');
-})
-    .on('reconnected', () => {
-    console.info('db reconnected');
+
+const db = mongoose.connection;
+
+db.on('error', (err) => {
+    console.error(err);
 });
+
+db.on('connected', async () => {
+    console.info('DB connected');
+    await createAdmin();
+});
+
+db.on('disconnected', () => {
+    console.info('DB disconnected');
+});
+
+db.on('reconnected', () => {
+    console.info('DB reconnected');
+});
+
 process.on('SIGINT', async () => {
     await db.close();
     process.exit(0);
