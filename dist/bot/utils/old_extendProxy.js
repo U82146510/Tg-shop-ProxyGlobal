@@ -1,11 +1,12 @@
 "use strict";
-
-export async function extendProxy(proxy_exp, proxy_id, api_key) {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.extendProxy = extendProxy;
+async function extendProxy(proxy_exp, proxy_id) {
     const url = `https://mobileproxy.space/api.html?command=ext_self_proxy&proxy_id=${proxy_id}&proxy_exp=${proxy_exp}`;
     try {
         const response = await fetch(url, {
             method: "GET",
-            headers: { 'Authorization': `Bearer ${api_key}` }
+            headers: { 'Authorization': 'Bearer bb34976790defa6c149e56af35122bf7' }
         });
         console.log(await response.json());
     }
@@ -13,3 +14,4 @@ export async function extendProxy(proxy_exp, proxy_id, api_key) {
         console.error(error);
     }
 }
+;

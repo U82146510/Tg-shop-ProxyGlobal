@@ -182,7 +182,7 @@ function orderHandler(bot) {
             const total = userBalance.minus(productPrice);
             user.balance = Decimal128.fromString(total.toString());
             order.expireAt = newExpireAt;
-            await (0, extendProxy_1.extendProxy)(formattedDate, order.proxy_id);
+            await (0, extendProxy_1.extendProxy)(formattedDate, order.proxy_id, product.apikey);
             await user.save();
             await order.save();
             const keyboard = new grammy_1.InlineKeyboard().text('📦 My Orders', 'my_orders').row();
