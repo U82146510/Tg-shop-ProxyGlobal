@@ -20,6 +20,7 @@ const { incomeStatistic } = require("./routes/monthIncomeRoute");
 const { logoutRoute } = require("./routes/logoutRoute");
 const { sendMsgRoute } = require("./routes/sendMessageRoute");
 const { logsRoute } = require("./routes/logsRoute");
+const { promocodeRoute } = require("./routes/promocodeRoute");
 
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
@@ -98,7 +99,8 @@ app.use("/admin", userRouter);
 app.use("/admin", incomeStatistic);
 app.use("/admin", logoutRoute);
 app.use("/admin", sendMsgRoute);
-app.use("/admin", logsRoute)
+app.use("/admin", logsRoute);
+app.use("/admin", promocodeRoute);
 
 // Error handler
 app.use((err, req, res, next) => {

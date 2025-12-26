@@ -1,0 +1,47 @@
+import {Promocode} from '../../models/promoCode.js';
+
+export const getPromocode = (req,res,next)=>{
+    try {
+        res.status(400).render('promocode',{error:null,message:null});
+    } catch (error) {
+        next(error)
+    }
+};
+
+
+export const postPromocode = async(req,res,next)=>{
+    const {promoCodeName,numberOfUse,discount} = req.body;
+
+    const removeDublicateUsers = new Set();
+    try {
+        if(!promoCodeName||!numberOfUse||!discount||!numberOfDays){
+            res.status(400).render('promocode',{error:'Please fill all the fields',message:null})
+            return;
+        }
+
+ 	const currentDate = new Date();
+        const millisecondsInDay = 24*60*60*1000;
+        const expire = new Date(currentDate.getTime()+(millisecondsInDay * numberOfDays))
+
+        const isTherePromocode = await Promocode.findOne({});
+        if(!isTherePromocode){
+            await Promocode.create({
+                promoCodeName,numberOfUse,discount,users: []
+            });
+        }
+
+        const allUsers = isTherePromocode.users;
+
+        allUsers.forEach(user=>{
+            removeDublicateUsers.add(user);
+        });
+
+        isTherePromocode.users = Array.from(removeDublicateUsers);
+        await isTherePromocode.save();
+
+        res.status(200).render('promocode',{ error: null, message: 'Promocode updated successfully' });
+
+    } catch (error) {
+        next(error)
+    }
+};

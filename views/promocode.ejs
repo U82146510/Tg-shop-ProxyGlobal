@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Promocode</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/admin/product.css">
+</head>
+<body>
+
+<nav class="nav">
+    <ul>
+        <li><a href="/admin/users">Dashboard</a></li>
+        <li><a href="/admin/user">User</a></li>
+        <li><a href="/admin/logs">User Logs</a></li>
+        <li><a href="/admin/userupdate">User Update</a></li>
+        <li><a href="/admin/product">Products</a></li>
+        <li><a href="/admin/statistics">Statistics</a></li>
+        <li><a href="/admin/update">Settings</a></li>
+        <li><a href="/admin/sendmessage">Send Message</a></li>
+    </ul>
+</nav>
+
+<div class="product-container">
+    <h2>Promocode</h2>
+
+    <!-- SUCCESS MESSAGE -->
+    <% if (message) { %>
+        <p class="message"><%= message %></p>
+    <% } %>
+
+    <!-- ERROR MESSAGE -->
+    <% if (error) { %>
+        <p class="error"><%= error %></p>
+    <% } %>
+
+    <form action="/admin/promocode" method="POST">
+        <h3>Create Promocode</h3>
+
+        <input
+            type="text"
+            name="promoCodeName"
+            placeholder="Promo Code Name"
+            required
+        />
+
+        <input
+            type="number"
+            name="numberOfUse"
+            placeholder="Number of Uses"
+            required
+        />
+
+        <input
+            type="number"
+            step="0.01"
+            name="discount"
+            placeholder="Discount"
+            required
+        />
+
+        <button type="submit">Create Promocode</button>
+    </form>
+
+
+    <form action="/admin/deletepromocode" method="POST">
+        <h3>Delete Promocode</h3>
+
+        <input
+            type="text"
+            name="promoCodeName"
+            placeholder="Promo Code Name"
+            required
+        />
+
+        <button type="submit">Delete Promocode</button>
+    </form>
+</div>
+
+</body>
+</html>
