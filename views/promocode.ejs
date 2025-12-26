@@ -18,6 +18,8 @@
         <li><a href="/admin/statistics">Statistics</a></li>
         <li><a href="/admin/update">Settings</a></li>
         <li><a href="/admin/sendmessage">Send Message</a></li>
+        <li><a href="/admin/promocode">Promocode</a></li>
+        <li><a href="/admin/logout">Logout</a></li>
     </ul>
 </nav>
 
@@ -35,7 +37,7 @@
     <% } %>
 
     <form action="/admin/promocode" method="POST">
-        <h3>Create Promocode</h3>
+        <h3>Create / Update Promocode</h3>
 
         <input
             type="text"
@@ -59,12 +61,20 @@
             required
         />
 
+        <input
+            type="number"
+            step="0.01"
+            name="numberOfDays"
+            placeholder="Discount"
+            required
+        />
+
         <button type="submit">Create Promocode</button>
     </form>
 
 
     <form action="/admin/deletepromocode" method="POST">
-        <h3>Delete Promocode</h3>
+        <h3>Create / Delete Promocode</h3>
 
         <input
             type="text"
@@ -74,6 +84,22 @@
         />
 
         <button type="submit">Delete Promocode</button>
+    </form>
+
+    <form action="/admin/allpromocodes" method="POST">
+        <h3>Get all Promocodes</h3>
+        <button type="submit">Get Promocode</button>
+        <% if (promocodes && promocodes.length) { %>
+            <% promocodes.forEach(promo => { %>
+                    <p class="message">
+                        <strong><%= promo.promoCodeName %></strong>
+                        — <%= promo.discount %>% off,
+                        uses: <%= promo.numberOfUse %>,
+                        expires: <%= promo.expire.toDateString() %>
+                    </p>
+            <% }) %>
+        <% } %>
+
     </form>
 </div>
 
