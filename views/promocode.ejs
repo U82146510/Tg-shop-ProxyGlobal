@@ -94,7 +94,7 @@
                     <p class="message">
                         <strong><%= promo.promoCodeName %></strong>
                         — <%= promo.discount %>$ off,
-                        uses: <%= promo.numberOfUse %>,
+                        uses: <%= promo.users.length %> / <%= promo.numberOfUse %>,
                         expires: <%= promo.expire.toDateString() %>
                     </p>
             <% }) %>
