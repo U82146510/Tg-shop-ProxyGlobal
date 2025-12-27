@@ -46,7 +46,9 @@ function backToMainMenu(bot) {
         await (0, cleanup_1.deleteCachedMessages)(ctx, `no_products${telegramId}`);
         await (0, cleanup_1.deleteCachedMessages)(ctx, `user_not_found${telegramId}`);
         await (0, cleanup_1.deleteCachedMessages)(ctx, `incorrect_amount${telegramId}`);
+	await (0, cleanup_1.deleteCachedMessages)(ctx, `promocode${telegramId}`);
         await (0, cleanup_1.deleteCachedMessages)(ctx, `myinfomenu${telegramId}`);
+        await (0, cleanup_1.deleteCachedMessages)(ctx, `promocodeIncorrect${telegramId}`);
         await (0, cleanup_1.deleteCachedMessages)(ctx, `deposit_crypto${telegramId}`);
         const msgRU = `Добро пожаловать в GlobalProxyShop!
 Наш сервис предлагает одни из самых доступных 4G мобильных прокси и гибкие тарифы под любые задачи.

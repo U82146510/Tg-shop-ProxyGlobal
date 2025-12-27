@@ -50,6 +50,17 @@ export const postPromocode = async(req,res,next)=>{
             return;
         }
 
+        const isValidPromocode = String(promoCodeName);
+        if(isValidPromocode.length !==8  ){
+            res.status(400).render('promocode', {
+                error: 'Promocode length hast to be equal with 8',
+                message: null,
+                promocodes:[]
+            });
+            return;
+        }
+
+
         const days = Number(numberOfDays);
         if(Number.isNaN(days) || days <= 0 ){
             res.status(400).render('promocode', {
