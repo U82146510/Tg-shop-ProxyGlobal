@@ -2,16 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fetchProxy = fetchProxy;
 exports.canBuyOff = canBuyOff;
-;
-
-//const date_fns_1 = require("date-fns");
-//const periodDays = parseInt(1, 10);
-//if (isNaN(periodDays) || periodDays <= 0) {
-//   throw new Error('Invalid period value');
-//}
-//const expireAt = (0, date_fns_1.addDays)(new Date(), periodDays);
-//const expireProxy = (0, date_fns_1.format)(expireAt, 'yyyy-MM-dd HH:mm:ss');
-
 
 async function fetchProxy(eid, proxy_comment, proxy_exp,apikey) { // Functia de arenda la proxy
     await canBuyOff(eid,apikey);
@@ -82,5 +72,4 @@ async function canBuyOff(eid,apikey,status = "0") {
     catch (error) {
         console.error(error);
     }
-}
-;
+};
