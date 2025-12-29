@@ -192,16 +192,6 @@ function registerBuyProxyHandler(bot) {
         const price = new Decimal(product.price);
 
         const expireAt = addDays(new Date(), parseInt(period));
-        const proxy = await fetchProxy(
-            eid,
-            telegramId,
-            format(expireAt, "yyyy-MM-dd HH:mm:ss"),
-            product.apikey
-        );
-
-        if (!proxy || !proxy.proxy_id) {
-            return ctx.reply("Proxy provider error");
-        }
 
         const updatedUser = await User.findOneAndUpdate(
             {
@@ -217,6 +207,27 @@ function registerBuyProxyHandler(bot) {
         if (!updatedUser) {
             return ctx.reply("Insufficient balance");
         }
+
+        const proxy = await fetchProxy(
+            eid,
+            telegramId,
+            format(expireAt, "yyyy-MM-dd HH:mm:ss"),
+            product.apikey
+        );
+
+        if (!proxy || !proxy.proxy_id) {
+        // 🔁 REFUND
+        await User.updateOne(
+            { userId: telegramId },
+            { $inc: { balance: Decimal128.fromString(price.toString()) } }
+        );
+
+        return ctx.reply("Proxy provider error. Balance refunded.");
+        }
+
+        
+
+        
 
         const newBalance = new Decimal(updatedUser.balance.toString());
 
