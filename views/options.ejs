@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shop Options</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/admin/promocode.css">
+</head>
+<body>
+
+<nav class="nav">
+    <ul>
+        <li><a href="/admin/users">Dashboard</a></li>
+        <li><a href="/admin/user">User</a></li>
+        <li><a href="/admin/logs">User Logs</a></li>
+        <li><a href="/admin/userupdate">User Update</a></li>
+        <li><a href="/admin/product">Products</a></li>
+        <li><a href="/admin/statistics">Statistics</a></li>
+        <li><a href="/admin/update">Settings</a></li>
+        <li><a href="/admin/sendmessage">Send Message</a></li>
+        <li><a href="/admin/promocode">Promocode</a></li>
+        <li><a href="/admin/options">Shop Settings</a></li>
+        <li><a href="/admin/logout">Logout</a></li>
+    </ul>
+</nav>
+
+<div class="product-container">
+    <h2>Shop Options</h2>
+
+    <!-- SUCCESS MESSAGE -->
+    <% if (message) { %>
+        <p class="message"><%= message %></p>
+    <% } %>
+
+    <!-- ERROR MESSAGE -->
+    <% if (error) { %>
+        <p class="error"><%= error %></p>
+    <% } %>
+
+    <form action="/admin/options" method="POST">
+        <h3>Enable/Disable Test Proxy</h3>
+
+        <div class="radio-group">
+            <label>
+                <input
+                    type="radio"
+                    name="enableProxyForTest"
+                    value="on"
+                    <%= enabled ? 'checked' : '' %>
+                >
+                Enable
+            </label>
+
+            <label>
+                <input
+                    type="radio"
+                    name="enableProxyForTest"
+                    value="off"
+                    <%= !enabled ? 'checked' : '' %>
+                >
+                Disable
+            </label>
+        </div>
+
+        <button type="submit">Save</button>
+    </form>
+
+    <form action="/admin/resetCountForTestButton" method="POST">
+        <h3>Reset User</h3>
+
+            <input
+            type="text"
+            name="telegramId"
+            placeholder="Telegram ID"
+            required
+        />
+
+        <button type="submit">Save</button>
+    </form>
+</div>
+
+</body>
+</html>

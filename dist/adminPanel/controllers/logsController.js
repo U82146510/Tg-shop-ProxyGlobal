@@ -36,7 +36,15 @@ export const logService = async (req,res,next)=>{
                 allOrders = await orderHistory.find({ country: userId.trim().toLowerCase() }).sort({ createdAt: -1 }).lean();
                 if (allOrders.length === 0) error = 'No logs found for this country';
                 break;
+             case 'byperiod': 
+                console.log('Fetching orders by country:', userId);
+                console.log('historyType:', historyType);
+                const fromDate = new Date(`${userId}T00:00:00.000Z`);
+                allOrders = await orderHistory.find({createdAt: { $gte: fromDate }}).sort({ createdAt: -1 }).lean();
+                if (allOrders.length === 0) error = 'No logs found from this date';
+                break;
         }
+
 
         res.render('logs', { payments, orders, historyType, allOrders, error });
 

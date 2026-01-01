@@ -3,34 +3,28 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.fetchProxy = fetchProxy;
 exports.canBuyOff = canBuyOff;
 
-
 async function fetchProxy(eid, proxy_comment, proxy_exp,apikey) { // Functia de arenda la proxy
     await canBuyOff(eid,apikey);
     const encodedComment = encodeURIComponent(proxy_comment);
     const encodedExpire = encodeURIComponent(proxy_exp);
-    let url = null;
-    if(proxy_exp==='0'){
-	console.log(eid,apikey)
-	console.log("test proxy")
-        url = `https://mobileproxy.space/api.html?command=add_self_test&eid=${eid}`;
-    }else{
-        url = `https://mobileproxy.space/api.html?command=add_self_proxy&eid=${eid}&proxy_comment=${encodedComment}&proxy_exp=${encodedExpire}`
-    }
+    const url = `https://mobileproxy.space/api.html?command=add_self_proxy&eid=${eid}&proxy_comment=${encodedComment}&proxy_exp=${encodedExpire}`;
     try {
         const response = await fetch(url, {
             method: "GET",
             headers: { 'Authorization': `Bearer ${apikey}` }
         });
         const data = await response.json();
-        console.log(data);
         const loginDetails = await fetchProxyID(data.pid,apikey);
-	console.log(loginDetails);
         return loginDetails;
-    }catch (error) {
+    }
+    catch (error) {
         console.error(error);
         return null;
     }
-};
+}
+;
+
+//fetchProxy("24362","1234556",expireProxy,"bb34976790defa6c149e56af35122bf7").then(data=>console.log(data)).catch(err=>console.log(err))
 
 async function fetchProxyID(id,apikey) { //Functia cerem info proxy arendat dupa id(proxyID)
     const url = `https://mobileproxy.space/api.html?command=get_my_proxy&proxy_id=${id}`;

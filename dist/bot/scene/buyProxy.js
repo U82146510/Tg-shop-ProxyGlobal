@@ -8,7 +8,7 @@ const { getProxy } = require("../fetch");
 const { User } = require("../../models/User");
 const { Order } = require("../../models/Orders");
 const Decimal = require("decimal.js");
-const { addDays, format } = require("date-fns");
+const { addDays, format, addHours } = require("date-fns");
 const { fetchProxy } = require("../utils/buyProxy");
 const {orderHistory} = require("../../models/orderHistory");
 const mongoose = require("mongoose");
@@ -87,6 +87,7 @@ function registerBuyProxyHandler(bot) {
             let isps = [];
             for (const key of apiKeys) {
                 const proxies = await getProxy(key);
+                console.log('TEST',proxies)
                 if (proxies) isps.push(...proxies);
             }
 
@@ -134,13 +135,41 @@ function registerBuyProxyHandler(bot) {
         if (!selected) return;
 
         const eid = selected.eid;
-        const keyboard = new InlineKeyboard()
+        
+       
+        
+
+        const hasUsedTestProxy = await redis.get(String(telegramId));
+        const isTestProxyEnabled = (await redis.get('enableTestProxyOption')) === 'true';
+        const showTestProxy = isTestProxyEnabled && !hasUsedTestProxy;
+        console.log("isTestProxyEnabled",isTestProxyEnabled);
+        console.log("showTestProxy",showTestProxy);
+        console.log("hasUsedTestProxy",hasUsedTestProxy);
+        if (showTestProxy) {
+            console.log("Set in redis userid");
+            await redis.set(
+                String(telegramId),
+                String(telegramId),
+                { ttl: 60 * 60 * 24 * 7 }
+            );
+        };
+        
+        const keyboard = new InlineKeyboard();
+        if (showTestProxy) {
+            console.log("Enable test button");
+            keyboard.text(
+                "Test Proxy (2h)",
+                `period_${countryName}_${ispName}_${eid}_0`
+            ).row();
+        };
+
+        keyboard
             .text("1 day", `period_${countryName}_${ispName}_${eid}_1`).row()
             .text("7 days", `period_${countryName}_${ispName}_${eid}_7`).row()
             .text("14 days", `period_${countryName}_${ispName}_${eid}_14`).row()
             .text("30 days", `period_${countryName}_${ispName}_${eid}_30`).row()
             .text("Back", `country_${countryName}`).row()
-            .text("Main Menu", "back_to_menu").row();
+            .text("Main Menu", "back_to_menu");
 
         const msg = await ctx.reply("Select rent period:", { reply_markup: keyboard });
         await redis.pushList(`operator_${telegramId}`, [String(msg.message_id)]);
@@ -159,7 +188,14 @@ function registerBuyProxyHandler(bot) {
         await deleteCachedMessages(ctx, `operator_${telegramId}`);
 
         const product = await Product.findOne({ isp: isp.toLowerCase(), period });
-        if (!product) return ctx.reply("Product not found");
+        if (!product){
+            const keybd = new InlineKeyboard();
+            const msg = await ctx.reply(`🔒 Product not found.`, {  // nu uita sa il adaugi la common
+                    reply_markup: keybd.text("Back", "back_to_menu").row()
+                });
+            await redis.pushList(`productNotFound${telegramId}`, [String(msg.message_id)]);
+            return;
+        } 
 
         const keyboard = new InlineKeyboard()
             .text("Checkout", `checkout_${eid}_${period}_${isp}`).row()
@@ -191,8 +227,7 @@ function registerBuyProxyHandler(bot) {
 
         const price = new Decimal(product.price);
 
-        const expireAt = addDays(new Date(), parseInt(period));
-
+        
         const updatedUser = await User.findOneAndUpdate(
             {
                 userId: telegramId,
@@ -203,17 +238,30 @@ function registerBuyProxyHandler(bot) {
             },
             { new: true }
         );
-
+        
         if (!updatedUser) {
             return ctx.reply("Insufficient balance");
         }
-
-        const proxy = await fetchProxy(
-            eid,
-            telegramId,
-            format(expireAt, "yyyy-MM-dd HH:mm:ss"),
-            product.apikey
-        );
+        
+        let proxy = null;
+        let expireAt = null;
+        if(period==='0'){
+            expireAt = addHours(new Date(), 2);
+            proxy = await fetchProxy(
+                eid,
+                telegramId,
+                '0',
+                product.apikey
+            );
+        }else{
+            expireAt = addDays(new Date(), parseInt(period));
+            proxy = await fetchProxy(
+                eid,
+                telegramId,
+                format(expireAt, "yyyy-MM-dd HH:mm:ss"),
+                product.apikey
+            );
+        }
 
         if (!proxy || !proxy.proxy_id) {
         // 🔁 REFUND

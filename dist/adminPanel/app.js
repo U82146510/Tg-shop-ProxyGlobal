@@ -21,6 +21,7 @@ const { logoutRoute } = require("./routes/logoutRoute");
 const { sendMsgRoute } = require("./routes/sendMessageRoute");
 const { logsRoute } = require("./routes/logsRoute");
 const { promocodeRoute } = require("./routes/promocodeRoute");
+const { optionsRoute } = require("./routes/optionRoute");
 
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
@@ -101,6 +102,7 @@ app.use("/admin", logoutRoute);
 app.use("/admin", sendMsgRoute);
 app.use("/admin", logsRoute);
 app.use("/admin", promocodeRoute);
+app.use("/admin", optionsRoute);
 
 // Error handler
 app.use((err, req, res, next) => {

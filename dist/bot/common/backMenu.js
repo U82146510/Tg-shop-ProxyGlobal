@@ -41,6 +41,8 @@ function backToMainMenu(bot) {
         await (0, cleanup_1.deleteCachedMessages)(ctx, `deposit_expired_${telegramId}`);
         await (0, cleanup_1.deleteCachedMessages)(ctx, `failed_to_generate${telegramId}`);
         await (0, cleanup_1.deleteCachedMessages)(ctx, `about_${telegramId}`);
+        await (0, cleanup_1.deleteCachedMessages)(ctx, `productNotFound${telegramId}`);
+        await (0, cleanup_1.deleteCachedMessages)(ctx, `isEligibleToBuyForTest${telegramId}`);
         await (0, cleanup_1.deleteCachedMessages)(ctx, `help_menu${telegramId}`);
         await (0, cleanup_1.deleteCachedMessages)(ctx, `inpurt_balance${telegramId}`);
         await (0, cleanup_1.deleteCachedMessages)(ctx, `no_products${telegramId}`);

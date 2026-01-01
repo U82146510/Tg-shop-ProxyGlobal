@@ -18,7 +18,7 @@
         <li><a href="/admin/statistics">Statistics</a></li>
         <li><a href="/admin/update">Settings</a></li>
         <li><a href="/admin/sendmessage">Send Message</a></li>
-	    <li><a href="/admin/promocode">Promocode</a></li>
+	<li><a href="/admin/promocode">Promocode</a></li>
         <li><a href="/admin/options">Shop Settings</a></li>
         <li><a href="/admin/logout">Logout</a></li>
     </ul>
@@ -69,17 +69,7 @@
                     value="bycountry"
                     <% if (historyType === 'bycountry') { %> checked <% } %>
                 >
-                All Orders History bY Country
-            </label>
-
-            <label>
-                <input
-                    type="radio"
-                    name="historyType"
-                    value="byperiod"
-                    <% if (historyType === 'byperiod') { %> checked <% } %>
-                >
-                All Orders History bY Period
+                All Orders History By Country
             </label>
 
         </div>
@@ -132,24 +122,6 @@
         </div>
     <% } %>
 
-
-    <% if (allOrders && allOrders.length > 0) { %>
-        <div class="user-details">
-            <h3>All orders History bY Period</h3>
-            <% allOrders.forEach(order => { %>
-                <p>
-                    <strong>Order ID:</strong> <%= order._id %><br>
-                    <strong>Amount:</strong> <%= order.price %><br>
-                    <strong>Country:</strong> <%= order.country %><br>
-                    <strong>ISP:</strong> <%= order.isp %><br>
-                    <strong>Period:</strong> <%= order.period %><br>
-                    <strong>Date:</strong> <%= order.createdAt.toISOString() %>
-                </p>
-            <% }) %>
-        </div>
-    <% } %>
-
-
     <% if (error) { %>
         <p class="error"><%= error %></p>
     <% } %>
@@ -157,3 +129,4 @@
 
 </body>
 </html>
+
