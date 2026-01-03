@@ -15,6 +15,8 @@ const decimal_js_1 = require("decimal.js");
 const extendProxy_1 = require("../utils/extendProxy");
 const mongoose_1 = __importDefault(require("mongoose"));
 const Decimal128 = mongoose_1.default.Types.Decimal128;
+const { orderHistory } = require("../../models/orderHistory");
+
 function orderHandler(bot) {
     bot.callbackQuery('my_orders', async (ctx) => {
         try {
@@ -137,6 +139,7 @@ function orderHandler(bot) {
             }
         }
         const telegramId = ctx.from?.id;
+        if (!telegramId) return;
         const [_, orderId, period] = ctx.match ?? [];
         try {
             await (0, cleanup_1.deleteCachedMessages)(ctx, `extend_${telegramId}`);
@@ -150,6 +153,30 @@ function orderHandler(bot) {
                 await redis_1.redis.pushList(redisKey, [String(msg.message_id)]);
                 return;
             }
+            const orderHistories = await orderHistory.findOne({proxy_id:order.proxy_id});
+            if (!orderHistories) {
+                orderHistories = new orderHistory({
+                    userId: order.userId,
+                    country: order.country,
+                    isp: order.isp,
+                    price: order.price,
+                    period: order.period,
+                    eid: order.eid,
+                    proxy_id: order.proxy_id,
+                    proxy_independent_http_hostname: order.proxy_independent_http_hostname,
+                    proxy_independent_socks5_hostname: order.proxy_independent_socks5_hostname,
+                    proxy_independent_port: order.proxy_independent_port,
+                    proxy_http_port: order.proxy_http_port,
+                    proxy_socks5_port: order.proxy_socks5_port,
+                    proxy_hostname: order.proxy_hostname,
+                    proxy_change_ip_url: order.proxy_change_ip_url,
+                    user: order.user,
+                    pass: order.pass,
+                    expireAt: order.expireAt,
+                    apikey: product.apikey
+                });
+            }
+
             const currentDate = order.expireAt ?? new Date();
             const addedDays = parseInt(period, 10);
             if (isNaN(addedDays)) {
@@ -182,12 +209,17 @@ function orderHandler(bot) {
             const total = userBalance.minus(productPrice);
             user.balance = Decimal128.fromString(total.toString());
             order.expireAt = newExpireAt;
+            orderHistories.expireAt = newExpireAt;
+            const currentPeriodDays = new decimal_js_1.Decimal(orderHistories.period || '0');
+            const addedPeriodDays = new decimal_js_1.Decimal(period);
+            orderHistories.period = currentPeriodDays.plus(addedPeriodDays).toString();
             await (0, extendProxy_1.extendProxy)(formattedDate, order.proxy_id, product.apikey);
             await user.save();
             await order.save();
+            await orderHistories.save();
             const keyboard = new grammy_1.InlineKeyboard().text('📦 My Orders', 'my_orders').row();
             keyboard.text('🏠 Main Menu', 'back_to_menu').row();
-            const msg = await ctx.reply(`✅ Order extended by ${addedDays} day(s).\n🕒 New expiration: ${formattedDate.toLocaleString()}`, {
+            const msg = await ctx.reply(`✅ Order extended by ${addedDays} day(s).\n🕒 New expiration: ${formattedDate}`, {
                 reply_markup: keyboard
             });
             const redisKey = `order_extended_success_${telegramId}`;

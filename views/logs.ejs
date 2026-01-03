@@ -133,21 +133,39 @@
     <% } %>
 
 
-    <% if (allOrders && allOrders.length > 0) { %>
+    <% if (ordersByCountry && ordersByCountry.length > 0) { %>
         <div class="user-details">
             <h3>All orders History bY Period</h3>
-            <% allOrders.forEach(order => { %>
+            <% ordersByCountry.forEach(order => { %>
                 <p>
                     <strong>Order ID:</strong> <%= order._id %><br>
                     <strong>Amount:</strong> <%= order.price %><br>
                     <strong>Country:</strong> <%= order.country %><br>
                     <strong>ISP:</strong> <%= order.isp %><br>
                     <strong>Period:</strong> <%= order.period %><br>
-                    <strong>Date:</strong> <%= order.createdAt.toISOString() %>
+                    <strong>Date:</strong> <%= order.createdAt.toLocaleDateString() %>
                 </p>
             <% }) %>
         </div>
     <% } %>
+
+    <% if (ordersByPeriod && ordersByPeriod.length > 0) { %>
+        <div class="user-details">
+            <h3>All orders History bY Period</h3>
+            <% ordersByPeriod.forEach(order => { %>
+                <p>
+                    <strong>Order ID:</strong> <%= order._id %><br>
+                    <strong>Amount:</strong> <%= order.price %><br>
+                    <strong>Country:</strong> <%= order.country %><br>
+                    <strong>ISP:</strong> <%= order.isp %><br>
+                    <strong>Period:</strong> <%= order.period %><br>
+                    <strong>Date:</strong> <%= order.createdAt.toLocaleDateString() %>
+                </p>
+            <% }) %>
+        </div>
+    <% } %>
+
+
 
 
     <% if (error) { %>
