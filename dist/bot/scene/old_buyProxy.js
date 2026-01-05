@@ -137,11 +137,22 @@ function registerBuyProxyHandler(bot) {
         const eid = selected.eid;
         
        
+        
+
         const hasUsedTestProxy = await redis.get(String(telegramId));
         const isTestProxyEnabled = (await redis.get('enableTestProxyOption')) === 'true';
         const showTestProxy = isTestProxyEnabled && !hasUsedTestProxy;
-
-  
+        console.log("isTestProxyEnabled",isTestProxyEnabled);
+        console.log("showTestProxy",showTestProxy);
+        console.log("hasUsedTestProxy",hasUsedTestProxy);
+        if (showTestProxy) {
+            console.log("Set in redis userid");
+            await redis.set(
+                String(telegramId),
+                String(telegramId),
+                { ttl: 60 * 60 * 24 * 7 }
+            );
+        };
         
         const keyboard = new InlineKeyboard();
         if (showTestProxy) {
@@ -264,14 +275,7 @@ function registerBuyProxyHandler(bot) {
 
         
 
-
-
-        await redis.set(
-            String(telegramId),
-            String(telegramId),
-            { ttl: 60 * 60 * 24 * 7 }
-        );
-
+        
 
         const newBalance = new Decimal(updatedUser.balance.toString());
 
