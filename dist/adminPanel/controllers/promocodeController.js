@@ -1,4 +1,9 @@
 import {Promocode} from '../../models/promoCode.js';
+import {z} from 'zod';
+
+const promocodeSchema = z.object({
+    promoCodeName:z.string()
+});
 
 export const getPromocode = (req,res,next)=>{
     try {
@@ -9,20 +14,20 @@ export const getPromocode = (req,res,next)=>{
 };
 
 export const deletePromocode = async (req,res,next)=>{
-    const {promoCodeName} = req.body;
+    const {result} = promocodeSchema.safeParse(req.body);
     try {
-        if(!promoCodeName || typeof promoCodeName !== 'string'){
+        if(!result.success){
             res.status(400).render('promocode',{error:'Promocode name is required',message:null,promocodes:[]})
             return;
         }
 
-        const isTherePromocode = await Promocode.findOneAndDelete({promoCodeName:promoCodeName.toLowerCase().trim()});
+        const isTherePromocode = await Promocode.findOneAndDelete({promoCodeName:result.promoCodeName.toLowerCase().trim()});
         if(!isTherePromocode){
             res.status(400).render('promocode',{error:'There is nothing to be deleted',message:null,promocodes:[]})
             return;
         }
 
-        res.status(200).render('promocode',{error:null,message:`Promocode ${promoCodeName} deleted.`,promocodes:[]});
+        res.status(200).render('promocode',{error:null,message:`Promocode ${result.promoCodeName} deleted.`,promocodes:[]});
     } catch (error) {
         next(error)
     }

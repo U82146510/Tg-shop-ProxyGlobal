@@ -64,7 +64,7 @@ export async function checkForDeposits(bot) {
                 throw new Error("Deposit already processed or expired");
             }
 
-            const commission = expected.mul(new Decimal("0.2"));
+            const commission = expected.mul(new Decimal("0.1"));
 
             await shopBalance.findOneAndUpdate(
                 { key: "shop-status" },
