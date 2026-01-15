@@ -10,6 +10,8 @@ const helmet = require("helmet");
 const methodOverride = require("method-override");
 const https = require("https");
 const fs = require("fs");
+const cors = require("cors");
+
 
 // Routes
 const { loginRouter } = require("./routes/loginRoute");
@@ -22,6 +24,8 @@ const { sendMsgRoute } = require("./routes/sendMessageRoute");
 const { logsRoute } = require("./routes/logsRoute");
 const { promocodeRoute } = require("./routes/promocodeRoute");
 const { optionsRoute } = require("./routes/optionRoute");
+const { productsPrice } = require("./routes/productsPriceRoute");
+
 
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
@@ -42,6 +46,9 @@ const port = 3000;
 app.set('trust proxy',1)
 
 // Security middleware
+
+app.use(cors());
+
 app.use(
     helmet({
         hsts: false,
@@ -103,6 +110,7 @@ app.use("/admin", sendMsgRoute);
 app.use("/admin", logsRoute);
 app.use("/admin", promocodeRoute);
 app.use("/admin", optionsRoute);
+app.use("/products",productsPrice);
 
 // Error handler
 app.use((err, req, res, next) => {

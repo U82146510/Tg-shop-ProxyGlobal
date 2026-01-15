@@ -1438,11 +1438,6 @@ footer {
 .plan-panel { display: none; }
 .plan-panel.active { display: block; }
 
-.region-grid{
-  display:grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 2rem;
-}
 
 .operators{
   color: var(--text-muted);
@@ -1454,23 +1449,44 @@ footer {
 }
 
 
-
-/* Make cards shorter (as in screenshot red line) but keep portrait feel */
-.region-grid .pricing-card{
-  width:300px !important;
-  min-height:380px !important;   /* shorter */
-  flex:0 0 auto !important;
-  padding-bottom:26px !important;
+.region-grid {
+  display: flex;          /* changed from grid to flex */
+  flex-wrap: nowrap;      /* prevent wrapping */
+  gap: 2rem;              /* spacing between cards */
+  overflow-x: auto;       /* enable horizontal scroll if too many cards */
+  padding-bottom: 0.5rem; /* space for scrollbar */
+  scroll-behavior: smooth;
 }
 
-/* Button: single line, slightly smaller font */
+.region-grid::-webkit-scrollbar {
+  height: 8px;
+}
+
+.region-grid::-webkit-scrollbar-thumb {
+  background-color: var(--accent); 
+  border-radius: 4px;
+}
+
+.region-grid::-webkit-scrollbar-track {
+  background: var(--bg-card);
+}
+
+/* Keep existing card sizes */
+.region-grid .pricing-card {
+  width: 300px !important;
+  min-height: 380px !important;
+  flex: 0 0 auto !important; /* prevents shrinking */
+  padding-bottom: 26px !important;
+}
+
 .region-grid .pricing-card .btn,
-.region-grid .pricing-card a.btn{
-  white-space:nowrap !important;
-  font-size:14px !important;
-  padding:14px 18px !important;
-  line-height:1 !important;
+.region-grid .pricing-card a.btn {
+  white-space: nowrap !important;
+  font-size: 14px !important;
+  padding: 14px 18px !important;
+  line-height: 1 !important;
 }
+
 
 /* Operators: same compact style as previous inline look */
 .operators-list{
