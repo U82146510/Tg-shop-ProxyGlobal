@@ -11,6 +11,7 @@ const methodOverride = require("method-override");
 const https = require("https");
 const fs = require("fs");
 const cors = require("cors");
+const { UAParser } = require("ua-parser-js");
 
 
 // Routes
@@ -25,7 +26,10 @@ const { logsRoute } = require("./routes/logsRoute");
 const { promocodeRoute } = require("./routes/promocodeRoute");
 const { optionsRoute } = require("./routes/optionRoute");
 const { productsPrice } = require("./routes/productsPriceRoute");
+const { metricsRouter } = require("./routes/metricsRoute");
 
+// Models
+const { Metrics } = require("../models/metrics");
 
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
@@ -47,8 +51,6 @@ app.set('trust proxy',1)
 
 // Security middleware
 
-app.use(cors());
-
 app.use(
     helmet({
         hsts: false,
@@ -68,6 +70,46 @@ const limiter = rateLimit({
     message: "Too many requests, try again later.",
 });
 app.use(limiter);
+
+//
+
+app.use(async(req,res,next)=>{
+    if (req.method === 'GET' && req.url === '/') {
+        try {
+            const userAgent = req.get('User-Agent') || 'Unknown';
+            const ipAddress = req.ip || 'Unknown';
+            const url = req.originalUrl || 'Unknown';
+
+            const parser = new UAParser();
+            const result = parser.setUA(userAgent).getResult();
+
+            // Fetch country from IP
+            let country = 'unknown';
+            if (ipAddress !== 'Unknown') {
+                try {
+                    const geoResponse = await fetch(`http://ip-api.com/json/${ipAddress}`);
+                    const geoData = await geoResponse.json();
+                    country = geoData.countryCode || geoData.country || 'unknown';
+                } catch (geoError) {
+                    console.error('Error fetching geolocation:', geoError.message);
+                    country = 'unknown';
+                }
+            }
+
+            await Metrics.create({
+                ipAddress,
+                url,
+                device: result.device.type || 'unknown',
+                os: result.os.name || 'unknown',
+                browser: result.browser.name || 'unknown',
+                country
+            });
+        } catch (error) {
+            console.error('Error logging metrics:', error);
+        }
+    }
+    next();
+});
 
 // Session configuration
 app.use(
@@ -110,6 +152,7 @@ app.use("/admin", sendMsgRoute);
 app.use("/admin", logsRoute);
 app.use("/admin", promocodeRoute);
 app.use("/admin", optionsRoute);
+app.use("/admin/metrics", metricsRouter);
 app.use("/products",productsPrice);
 
 // Error handler

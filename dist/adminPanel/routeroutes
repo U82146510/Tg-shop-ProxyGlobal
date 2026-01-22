@@ -1,0 +1,8 @@
+import { Router } from "express";
+import { metricsGet } from "../controllers/metricsController.js";
+
+const metricsRouter = Router();
+
+metricsRouter.get("/metrics", metricsGet);
+
+export { metricsRouter };
