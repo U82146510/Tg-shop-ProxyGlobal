@@ -41,6 +41,16 @@
                 <% }) %>
             </tbody>
         </table>
+    <!-- Pagination Controls -->
+    <div class="pagination">
+        <% if (currentPage > 1) { %>
+            <a href="?page=<%= currentPage - 1 %>" class="page-btn">Previous</a>
+        <% } %>
+        <span>Page <%= currentPage %> of <%= totalPages %></span>
+        <% if (currentPage < totalPages) { %>
+            <a href="?page=<%= currentPage + 1 %>" class="page-btn">Next</a>
+        <% } %>
+    </div>
     </div>
 </body>
 </html>

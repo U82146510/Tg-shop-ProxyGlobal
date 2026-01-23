@@ -8,13 +8,22 @@ const schemaUser = zod_1.z.object({
 });
 const users = async (req, res, next) => {
     try {
-        const allUsers = await User_1.User.find().select('userId balance ');
-        if (allUsers.length === 0) {
-            res.status(404).json({ message: 'Not found' });
-        }
-        res.render('dashboard', { users: allUsers });
-    }
-    catch (error) {
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
+        const skip = (page - 1) * limit;
+        const totalUsers = await User_1.User.countDocuments();
+        const totalPages = Math.ceil(totalUsers / limit);
+        const users = await User_1.User.find()
+            .select('userId balance')
+            .skip(skip)
+            .limit(limit);
+
+        res.render('dashboard', {
+            users,
+            currentPage: page,
+            totalPages
+        });
+    } catch (error) {
         next(error);
     }
 };
