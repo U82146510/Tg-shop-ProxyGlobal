@@ -21,6 +21,7 @@ const app_1 = require("../adminPanel/app");
 const resetMontlyBalance_1 = require("../adminPanel/utils/resetMontlyBalance");
 const deleteOrderChecker_1 = require("./job/deleteOrderChecker");
 const myInfo_1 = require("./scene/myInfo");
+const { myReview } = require("./scene/review");
 dotenv_1.default.config({
     path: path_1.default.resolve(__dirname, '../../.env')
 });
@@ -39,7 +40,11 @@ const start = async () => {
         (0, start_1.registerMainMenu)(exports.bot);
         (0, backMenu_1.backToMainMenu)(exports.bot);
         (0, orders_1.orderHandler)(exports.bot);
+        myReview(exports.bot);
         (0, myBalance_1.registerBalanceMenu)(exports.bot);
+        // Register shared message handler for all text messages
+        const { sharedMessageHandler } = require('./scene/messageHandler');
+        exports.bot.on('message:text', sharedMessageHandler);
         (0, aboutMenu_1.registerAboutMenu)(exports.bot);
         (0, depositChecker_1.startDepositChecker)(exports.bot);
         (0, helpMenu_1.helpMenu)(exports.bot);

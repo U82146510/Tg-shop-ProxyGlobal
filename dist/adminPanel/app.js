@@ -8,8 +8,6 @@ const dotenv = require("dotenv");
 const path = require("path");
 const helmet = require("helmet");
 const methodOverride = require("method-override");
-const https = require("https");
-const fs = require("fs");
 const cors = require("cors");
 const { UAParser } = require("ua-parser-js");
 
@@ -27,6 +25,7 @@ const { promocodeRoute } = require("./routes/promocodeRoute");
 const { optionsRoute } = require("./routes/optionRoute");
 const { productsPrice } = require("./routes/productsPriceRoute");
 const { metricsRouter } = require("./routes/metricsRoute");
+const { reviewRoute } = require("./routes/reviewRoute");
 
 // Models
 const { Metrics } = require("../models/metrics");
@@ -50,6 +49,8 @@ const port = 3000;
 app.set('trust proxy',1)
 
 // Security middleware
+
+//app.use(cors())
 
 app.use(
     helmet({
@@ -154,6 +155,7 @@ app.use("/admin", promocodeRoute);
 app.use("/admin", optionsRoute);
 app.use("/admin/metrics", metricsRouter);
 app.use("/products",productsPrice);
+app.use("/reviews", reviewRoute);
 
 // Error handler
 app.use((err, req, res, next) => {

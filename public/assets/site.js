@@ -57,17 +57,16 @@ function renderPlans(plans) {
   buttons.forEach(btn => {
     btn.addEventListener('click', function () {
       setActive(this.dataset.plan);
-
-      // Scroll the selected panel into view horizontally
-      const panelGrid = document.querySelector(`.plan-panel[data-plan="${this.dataset.plan}"] .region-grid`);
-      panelGrid?.scrollIntoView({ behavior: 'smooth', inline: 'start' });
+      // Scroll the selected panel into view horizontally (disabled to prevent scroll jump)
+      // const panelGrid = document.querySelector(`.plan-panel[data-plan="${this.dataset.plan}"] .region-grid`);
+      // panelGrid?.scrollIntoView({ behavior: 'smooth', inline: 'start' });
     });
   });
 
   // Make the first panel active and scroll it into view on load
   if (panels.length > 0) {
     panels[0].classList.add('active');
-    panels[0].querySelector('.region-grid')?.scrollIntoView({ behavior: 'smooth', inline: 'start' });
+    // panels[0].querySelector('.region-grid')?.scrollIntoView({ behavior: 'smooth', inline: 'start' });
   }
 }
 
@@ -194,11 +193,9 @@ function capitalize(str) {
 
   // If page loads with a hash, center it after render
   window.addEventListener('load', function () {
+    // Prevent browser default jump to hash by resetting scroll position
     if (location.hash && location.hash.length > 1) {
-      var el = document.getElementById(location.hash.slice(1));
-      if (el) {
-        setTimeout(function () { scrollToSection(el); }, 50);
-      }
+      setTimeout(function () { window.scrollTo({ top: 0, behavior: 'auto' }); }, 10);
     }
   });
 })();

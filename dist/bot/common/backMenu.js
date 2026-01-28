@@ -22,6 +22,7 @@ function backToMainMenu(bot) {
             return;
         const firstName = ctx.from?.first_name ?? 'Anonymous';
         const languageCode = ctx.from?.language_code ?? 'unknown';
+        await (0, cleanup_1.deleteCachedMessages)(ctx, `myreviewmenu${telegramId}`);
         await (0, cleanup_1.deleteCachedMessages)(ctx, `input_balance${telegramId}`);
         await (0, cleanup_1.deleteCachedMessages)(ctx, `buy_proxy${telegramId}`);
         await (0, cleanup_1.deleteCachedMessages)(ctx, `isp_${telegramId}`);
