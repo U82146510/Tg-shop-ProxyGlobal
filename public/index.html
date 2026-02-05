@@ -51,8 +51,10 @@
           <li><a href="#reviews">Reviews</a></li>
           <li><a href="#howto">How to buy</a></li>
         </ul>
-<a class="nav-cta" href="https://t.me/GlobalProxy_bot">Buy in Telegram APP</a>
-<a class="nav-cta" href="https://web.telegram.org/k/#@GlobalProxy_bot?startapp=buy">Buy in Web Telegram</a>
+<div class="nav-ctas">
+  <a class="nav-cta" href="https://t.me/GlobalProxy_bot">Buy in Telegram APP</a>
+  <a class="nav-cta" href="https://web.telegram.org/k/#@GlobalProxy_bot?startapp=buy">Buy in Web Telegram</a>
+</div>
 <button class="mobile-menu-btn">☰</button>
 </div>
 </nav>
@@ -224,6 +226,31 @@
     </section>
 <!-- CTA Section -->
 
+<!-- BEGIN LIVE CHAT WIDGET -->
+<div class="live-chat" id="liveChatWidget" aria-live="polite">
+
+  <button class="live-chat-toggle" id="liveChatToggle" aria-expanded="true" aria-controls="liveChatPanel">
+    Live Chat
+  </button>
+
+  <div class="live-chat-panel" id="liveChatPanel">
+
+    <div class="live-chat-header">
+      <div class="live-chat-title" style="font-weight: 700; letter-spacing: 0.2px;">Support</div>
+      <button class="live-chat-close" id="liveChatClose" aria-label="Close chat">×</button>
+    </div>
+    
+    <div class="live-chat-messages" id="liveChatMessages"></div>
+    <form class="live-chat-form" id="liveChatForm">
+      <input class="live-chat-input" id="liveChatInput" type="text" placeholder="Type your message..." autocomplete="off" />
+      <button class="live-chat-send" type="submit">Send</button>
+    </form>
+
+  </div>
+
+</div>
+<!-- END LIVE CHAT WIDGET -->
+
 <!-- Footer -->
 <footer>
 <div class="footer-container">
@@ -248,13 +275,18 @@
 <li><a href="#reviews">Reviews</a></li>
           <li><a href="#howto">How to buy</a></li>
 <li><a href="https://t.me/globalproxy_support" target="_blank" rel="noopener noreferrer">Telegram Support</a></li>
+<li><a href="terms.html">Terms of Service</a></li>
+<li><a href="privacy.html">Privacy Policy</a></li>
+<li><a href="refund.html">Refund Policy</a></li>
+<li><a href="abuse.html">Abuse Policy</a></li>
 </ul>
 </div>
 <div>
 <h4 class="footer-title">Support</h4>
 <ul class="footer-links">
 	<li><span class="footer-label">Telegram:</span> <a href="https://t.me/globalproxy_support" target="_blank" rel="noopener noreferrer">@globalproxy_support</a></li>
-	<li><span class="footer-label">Email:</span> <a href="mailto:support@globalproxy.store">support@globalproxy.store</a></li></ul>
+  <li><span class="footer-label">Email:</span> <a href="mailto:support@globalproxy.store">support@globalproxy.store</a></li>
+  <li><span class="footer-label">Phone:</span> <a href="tel:+447441477449">+44 7441 477449</a></li></ul>
 </div>
 </div>
 <div class="footer-bottom">
@@ -273,6 +305,7 @@
 
 <script src="assets/site.js" defer></script>
 <script src="assets/reviews.js"></script>
+<script src="assets/live-chat.js" defer></script>
 <script>
   setTimeout(function() {
     var topEl = document.getElementById('top');

@@ -206,6 +206,20 @@ function capitalize(str) {
   if(y){ y.textContent = new Date().getFullYear(); }
 })();
 
+// Mobile nav toggle
+(function(){
+  var menuBtn = document.querySelector('.mobile-menu-btn');
+  var navLinks = document.querySelector('.nav-links');
+  var navCtas = document.querySelector('.nav-ctas');
+  if (!menuBtn || !navLinks || !navCtas) return;
+
+  menuBtn.addEventListener('click', function () {
+    navLinks.classList.toggle('active');
+    navCtas.classList.toggle('active');
+    document.body.classList.toggle('menu-open');
+  });
+})();
+
 // Smooth scroll for internal anchor links
 (function(){
   document.addEventListener('click', function(e){

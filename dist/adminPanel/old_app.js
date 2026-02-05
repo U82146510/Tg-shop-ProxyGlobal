@@ -6,13 +6,10 @@ const rateLimit = require("express-rate-limit");
 const MongoStore = require("connect-mongo");
 const dotenv = require("dotenv");
 const path = require("path");
-const http = require("http");
-const WebSocket = require("ws");
 const helmet = require("helmet");
 const methodOverride = require("method-override");
 const cors = require("cors");
 const { UAParser } = require("ua-parser-js");
-const { redis } = require("../bot/utils/redis");
 
 
 // Routes
@@ -46,110 +43,8 @@ if (!secretKey) {
     throw new Error("missing secret key");
 }
 
-const telegramBotToken = process.env.bot_token;
-const liveChatOperatorId = process.env.live_chat_operator_id || "7251191279";
-
-const sendTelegramMessage = async (text) => {
-    if (!telegramBotToken || !liveChatOperatorId) return;
-    const url = `https://api.telegram.org/bot${telegramBotToken}/sendMessage`;
-    try {
-        await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                chat_id: liveChatOperatorId,
-                text,
-                parse_mode: "HTML",
-            }),
-        });
-    } catch (error) {
-        console.error("Failed to send Telegram message:", error);
-    }
-};
-
 const app = express();
 const port = 3000;
-
-const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
-const liveChatSessions = new Map();
-const liveChatQueueTtl = 60 * 60 * 24;
-const liveChatHeartbeatInterval = 30 * 1000;
-
-const flushQueuedMessages = async (sessionId, ws) => {
-    try {
-        const queueKey = `live_chat_queue:${sessionId}`;
-        const queued = await redis.getList(queueKey);
-        if (queued?.length) {
-            queued.forEach((item) => {
-                if (ws.readyState === WebSocket.OPEN) {
-                    ws.send(item);
-                }
-            });
-            await redis.delete(queueKey);
-        }
-    } catch (error) {
-        console.error("Failed to flush live chat queue:", error);
-    }
-};
-
-wss.on("connection", (ws) => {
-    ws.isAlive = true;
-
-    ws.on("pong", () => {
-        ws.isAlive = true;
-    });
-
-    ws.on("message", (message) => {
-        try {
-            const payload = JSON.parse(message.toString());
-            if (payload?.sessionId) {
-                ws.sessionId = payload.sessionId;
-                liveChatSessions.set(payload.sessionId, ws);
-                if (!ws.isInitialized) {
-                    ws.isInitialized = true;
-                    flushQueuedMessages(payload.sessionId, ws);
-                }
-            }
-            ws.isAlive = true;
-            if (payload?.type === "chat_message" && payload?.text && payload?.sessionId) {
-                sendTelegramMessage(`/livechat ${payload.sessionId} ${payload.text}`);
-            }
-        } catch (error) {
-            console.error("Invalid WS message:", error);
-        }
-    });
-
-    ws.on("close", () => {
-        if (ws.sessionId) {
-            liveChatSessions.delete(ws.sessionId);
-            redis.set(`live_chat_last_seen:${ws.sessionId}`, String(Date.now()), { ttl: liveChatQueueTtl }).catch(() => {});
-        }
-    });
-
-    ws.on("error", () => {
-        if (ws.sessionId) {
-            liveChatSessions.delete(ws.sessionId);
-        }
-    });
-});
-
-const heartbeatInterval = setInterval(() => {
-    wss.clients.forEach((ws) => {
-        if (ws.isAlive === false) {
-            if (ws.sessionId) {
-                liveChatSessions.delete(ws.sessionId);
-            }
-            return ws.terminate();
-        }
-        ws.isAlive = false;
-        ws.ping();
-    });
-}, liveChatHeartbeatInterval);
-
-wss.on("close", () => {
-    clearInterval(heartbeatInterval);
-});
 
 app.set('trust proxy',1)
 
@@ -168,7 +63,6 @@ app.disable("etag");
 
 // Body parsing
 app.use(express.urlencoded({ extended: false }));
-app.use(express.json({ limit: "50kb" }));
 
 // Rate limiting
 const limiter = rateLimit({
@@ -177,25 +71,6 @@ const limiter = rateLimit({
     message: "Too many requests, try again later.",
 });
 app.use(limiter);
-
-app.post("/live-chat/reply", async (req, res) => {
-    const text = req.body?.text;
-    const sessionId = req.body?.sessionId;
-    if (!text || typeof text !== "string" || !sessionId || typeof sessionId !== "string") {
-        return res.status(400).json({ message: "Invalid message." });
-    }
-    const target = liveChatSessions.get(sessionId);
-    if (target && target.readyState === WebSocket.OPEN) {
-        target.send(JSON.stringify({ type: "operator_message", text, sessionId }));
-        return res.status(200).json({ ok: true, delivered: true });
-    }
-    await redis.pushList(
-        `live_chat_queue:${sessionId}`,
-        [JSON.stringify({ type: "operator_message", text, sessionId, ts: Date.now() })],
-        liveChatQueueTtl
-    );
-    return res.status(200).json({ ok: true, delivered: false, queued: true });
-});
 
 //
 
@@ -296,11 +171,7 @@ app.use((req, res) => {
 // Server start
 const startAdminPanel = async () => {
     try {
-        const redisClient = redis.getClient();
-        if (!redisClient.isOpen) {
-            await redis.connect();
-        }
-        server.listen(port,'127.0.0.1', () => {
+        app.listen(port,'127.0.0.1', () => {
             console.log(`Admin Panel running with HTTP on port ${port}`);
         });
     } catch (error) {

