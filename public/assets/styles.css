@@ -21,6 +21,7 @@
 
 html {
 	scroll-behavior: smooth;
+	overflow-x: hidden;
 }
 
 body {
@@ -28,6 +29,12 @@ body {
 	background: var(--bg-dark);
 	color: var(--text-primary);
 	line-height: 1.6;
+	overflow-x: hidden;
+}
+
+html[lang="ru"] body {
+	overflow-wrap: anywhere;
+	word-break: break-word;
 }
 
 .top-contact {
@@ -46,6 +53,8 @@ body {
 	color: var(--text-secondary);
 	background: rgba(13, 13, 13, 0.85);
 	border-bottom: 1px solid var(--border);
+	max-width: 100%;
+	overflow-x: hidden;
 }
 
 .top-contact-item {
@@ -2141,6 +2150,46 @@ p, .text, .content p {
 
 	.live-chat-form{
 		padding: 10px;
+	}
+}
+
+@media (max-width: 576px){
+	:root{
+		--top-contact-height: 64px;
+	}
+
+	.top-contact{
+		flex-direction: column;
+		align-items: center;
+		padding: 0.35rem 0.75rem;
+		font-size: 0.75rem;
+		gap: 0.4rem 0.8rem;
+		text-align: center;
+	}
+
+	.top-contact-item{
+		display: block;
+		max-width: 100%;
+	}
+
+	html[lang="ru"] .top-contact{
+		font-size: 0.7rem;
+	}
+
+	html[lang="ru"] .top-contact-item{
+		overflow-wrap: anywhere;
+		word-break: break-word;
+	}
+
+	.lang-switch{
+		top: calc(6px + var(--top-contact-height));
+		right: 10px;
+		padding: 6px 8px;
+	}
+
+	.lang-switch a{
+		padding: 3px 8px;
+		font-size: 0.75rem;
 	}
 }
 
