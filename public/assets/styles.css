@@ -144,6 +144,14 @@ nav {
 	transform: translateY(-1px);
 }
 
+html[lang="ru"] .nav-links {
+	gap: 1.2rem;
+}
+
+html[lang="ru"] .nav-links a {
+	font-size: 0.9rem;
+}
+
 /* Hero Section */
 .hero {
 	/* min-height: 100vh; */
@@ -1972,6 +1980,49 @@ p, .text, .content p {
   #howto{ padding:70px 2rem; }
   #howto .guides-grid{ grid-template-columns:1fr; }
 }
+
+/* ===== SIGN UP VIDEO SECTION ===== */
+#signup{
+	padding:90px 2rem;
+	background: var(--bg-card);
+}
+
+#signup .signup-grid{
+	display:grid;
+	grid-template-columns:minmax(0, 1fr);
+	gap:24px;
+	margin-top:44px;
+}
+
+#signup .signup-card{
+	background:rgba(255,255,255,0.03);
+	border:1px solid rgba(255,255,255,0.08);
+	border-radius:18px;
+	padding:22px;
+}
+
+#signup .video-wrap{
+	max-width: 860px;
+	margin: 0 auto;
+}
+
+#signup video{
+	width: 100%;
+	height: auto;
+	display: block;
+	border-radius: 16px;
+}
+
+#signup .signup-actions{
+	margin-top:16px;
+	display:flex;
+	justify-content:center;
+}
+
+@media (max-width: 768px){
+	#signup{ padding:70px 2rem; }
+}
+
 
 /* ===== LIVE CHAT WIDGET ===== */
 .live-chat{
